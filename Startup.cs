@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using CoreAPI_EF.Installers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -29,7 +30,7 @@ namespace CoreAPI_EF
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.InstallServicesInAssembly(Configuration);
 
             services.AddSwaggerGen(x => {
                 x.SwaggerDoc("v1", new OpenApiInfo { Title = "EF Core API", Version = "v1" });
@@ -50,6 +51,14 @@ namespace CoreAPI_EF
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseHsts();
+            app.UseCors(builder =>
+            {
+                builder.AllowAnyOrigin();      // or use:  builder.WithOrigins("http://yourclient/","","");
+                builder.AllowAnyMethod();
+                builder.AllowAnyHeader();
+            });
 
             var swaggerOptions = new Options.SwaggerOptions();
             Configuration.GetSection(nameof(SwaggerOptions)).Bind(swaggerOptions);
